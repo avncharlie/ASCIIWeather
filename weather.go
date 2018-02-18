@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -44,18 +44,22 @@ func getInput() (string, string, int) {
 	return forecast_type, unit_type, days
 }
 
-func useWeatherApi(url string) []byte {
+// uses provided weather api to receive information and return it
+func useWeatherApi(url string) map[string]interface{} {
+	var data map[string]interface{} // will hold the data
+
 	client := http.Client{}
 	request, _ := http.NewRequest(http.MethodGet, url, nil)
 	res, _ := client.Do(request)
 	body, _ := ioutil.ReadAll(res.Body)
-	return body
-	//_ = json.Unmarshal(body)
+	_ = json.Unmarshal(body, &data)
+
+	return data
 }
 
-// returns the weather information as json based on the input
+// returns the weather information based on the input, after creating url
 func getWeatherInfo(forecast_type string, unit_type string, forecast_days int,
-	api_key string) string {
+	api_key string) map[string]interface{} {
 
 	url := "https://extension.codecadets.com/api/current/?key=" + api_key
 	if forecast_type == "f" {
@@ -64,16 +68,21 @@ func getWeatherInfo(forecast_type string, unit_type string, forecast_days int,
 	}
 
 	response := useWeatherApi(url)
-
-	fmt.Println(string(response))
-
-	return "foo"
+	return response
 }
 
 func main() {
 	api_key := "fb171458a2e430573cd3edc90962b473"
 
+	// introduction
 	fmt.Println("Welcome to ASCIIWeather!")
+
+	// get input
 	forecast_type, unit_type, forecast_days := getInput()
-	_ = getWeatherInfo(forecast_type, unit_type, forecast_days, api_key)
+
+	// create api url and retrieve info
+	weather_info := getWeatherInfo(forecast_type, unit_type, forecast_days,
+		api_key)
+
+	fmt.Println(weather_info)
 }
