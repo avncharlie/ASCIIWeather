@@ -71,6 +71,60 @@ func getWeatherInfo(forecast_type string, unit_type string, forecast_days int,
 	return response
 }
 
+// use all collected info to generate output
+func displayOutput(data map[string]interface{}, forecast_type string,
+	unit_type string, forecast_days int) {
+	// current forecast
+	if forecast_type == "c" {
+		// collect information
+		current := data["current"].(map[string]interface{})
+
+		// all non-metric data
+		last_updated := current["last_updated"].(string)
+		condition := current["condition"].(map[string]interface{})["text"].(string)
+		cloud := int(current["cloud"].(float64))
+		humidity := int(current["humidity"].(float64))
+
+		// metric data
+		feels_like := current["feelslike_c"].(float64)
+		temperature := current["temp_c"].(float64)
+		wind := current["wind_kph"].(float64)
+		rainfall := current["precip_mm"].(float64)
+		visibility := current["vis_km"].(float64)
+
+		// metric suffixes
+		temp_suffix := "C"
+		wind_suffix := "Km/h"
+		rain_suffix := "mm"
+		visibility_suffix := "Km"
+
+		// imperial data
+		if unit_type == "i" {
+			feels_like = current["feelslike_f"].(float64)
+			temperature = current["temp_f"].(float64)
+			wind = current["wind_mph"].(float64)
+			rainfall = current["precip_in"].(float64)
+			visibility = current["vis_miles"].(float64)
+
+			// imperial suffixes
+			temp_suffix = "F"
+			wind_suffix = "Mi/h"
+			rain_suffix = "in"
+			visibility_suffix = " Miles"
+		}
+
+		// output information
+		fmt.Printf("CURRENT WEATHER (last updated %s)\n", last_updated)
+		fmt.Printf("%s, %d cloud and it feels like %.1f degrees %s.\n",
+			condition, cloud, feels_like, temp_suffix)
+		fmt.Printf("Temperature:	%.1fo%s\n", temperature, temp_suffix)
+		fmt.Printf("Wind:		%.1f%s\n", wind, wind_suffix)
+		fmt.Printf("Rainfall:	%.1f%s\n", rainfall, rain_suffix)
+		fmt.Printf("Humidity:	%d%%\n", humidity)
+		fmt.Printf("Visibility:	%.1f%s\n", visibility, visibility_suffix)
+	}
+}
+
 func main() {
 	api_key := "fb171458a2e430573cd3edc90962b473"
 
@@ -84,5 +138,6 @@ func main() {
 	weather_info := getWeatherInfo(forecast_type, unit_type, forecast_days,
 		api_key)
 
-	fmt.Println(weather_info)
+	// print weather info
+	displayOutput(weather_info, forecast_type, unit_type, forecast_days)
 }
