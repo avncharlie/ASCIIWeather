@@ -1,5 +1,12 @@
 package main
 
+// Code Cadets sign up task - CLI to tell or predict the current or future
+// weather. Uses API provided by Code Cadets, so all weather info provided is in
+// Canberra. Can predict up to 7 days ahead, and output in imperial or metric
+// form.
+
+// Made by Alvin Charles, alvin.charles@cgs.act.edu.au
+
 import (
 	"bufio"
 	"encoding/json"
@@ -169,6 +176,7 @@ func printFutureForecast(data map[string]interface{}, unit_type string) {
 			visibility_suffix = " Miles"
 		}
 
+		// actual output
 		fmt.Printf("\n")
 		fmt.Printf("|| %s (%d day(s) away) ||\n", date, days_away)
 		fmt.Printf("|| %s\n", cond)
